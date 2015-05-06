@@ -12,13 +12,15 @@
  */
 package ar.com.kfgodel.decomposer.impl;
 
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
 import ar.com.kfgodel.decomposer.api.DependenciaCircularException;
 import ar.com.kfgodel.decomposer.api.ProcesadorDeTareasParticionables;
 import ar.com.kfgodel.decomposer.api.ResultadoIterativo;
 import ar.com.kfgodel.decomposer.api.TareaParticionable;
+import ar.com.kfgodel.tostring.ImplementedWithStringer;
+import ar.com.kfgodel.tostring.Stringer;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -29,6 +31,7 @@ import java.util.List;
  * @author D. García
  */
 public class ProcesadorDeParticionables implements ProcesadorDeTareasParticionables {
+	private final static Logger LOG = LoggerFactory.getLogger(ProcesadorDeParticionables.class);
 
 	private TareaParticionable<?> tareaActual;
 	public static final String tareaActual_FIELD = "tareaActual";
@@ -41,11 +44,14 @@ public class ProcesadorDeParticionables implements ProcesadorDeTareasParticionab
 	 */
 	@Override
 	public <R> ResultadoIterativo<R> procesar(final TareaParticionable<R> tarea) throws DependenciaCircularException {
+		LOG.debug("Starting to process task[{}] in processor[{}}", tarea, this);
 		prepararComoProxima(tarea);
 
 		this.procesarPendientes();
 
 		final ResultadoIterativo<R> resultadoProcesado = tarea.getResultado();
+
+		LOG.debug("Finished with result[{}] task[{}]", resultadoProcesado, tarea);
 		return resultadoProcesado;
 	}
 
@@ -56,11 +62,16 @@ public class ProcesadorDeParticionables implements ProcesadorDeTareasParticionab
 	 *            La tarea a procesar
 	 */
 	private <R> void prepararComoProxima(final TareaParticionable<R> tarea) {
-		tarea.prepararRecursos();
-		pendientes.encolarProxima(tarea);
+		LOG.trace("Preparing resources for task[{}]", tarea);
+        tarea.prepararRecursos();
+        agregarProxima(tarea);
 	}
 
-	/**
+    private <R> void agregarProxima(TareaParticionable<R> tarea) {
+        pendientes.encolarProxima(tarea);
+    }
+
+    /**
 	 * Procesa todas las tareas pendientes en el orden que están, agregando nuevas a medida que van
 	 * surgiendo
 	 */
@@ -79,18 +90,26 @@ public class ProcesadorDeParticionables implements ProcesadorDeTareasParticionab
 		// La registramos como actual para los metodos que usan actual como implicito
 		tareaActual = tareaProcesada;
 
+        LOG.debug("Running task[{}]", tareaActual);
 		// La ejecutamos completamente (puede auto encolarse)
 		tareaActual.ejecutarCon(this);
 
 		// Si ya no está como pendiente, entonces terminamos con la tarea
 		if (!pendientes.contieneA(tareaActual)) {
+            LOG.debug("Completed task[{}]. Releasing resources", tareaActual);
 			tareaProcesada.liberarRecursos();
-		}
+		}else{
+            LOG.debug("Unfinished task[{}]. Waiting for sub-tasks", tareaProcesada);
+        }
 		// Si esta como pendiente se liberará en otra vuelta
 		tareaActual = null;
 	}
 
-	public static ProcesadorDeParticionables create() {
+    private void posponerActual() {
+        agregarProxima(tareaActual);
+    }
+
+    public static ProcesadorDeParticionables create() {
 		final ProcesadorDeParticionables procesador = new ProcesadorDeParticionables();
 		procesador.pendientes = ColaDeTareas.create();
 		return procesador;
@@ -110,10 +129,11 @@ public class ProcesadorDeParticionables implements ProcesadorDeTareasParticionab
 	 */
 	@Override
 	public void procesarRequisitosYContinuarConActual(final List<? extends TareaParticionable<?>> requisitos) {
+		LOG.trace("Holding task[{}] until {} more done", tareaActual, requisitos.size());
 		// Primero ponemos la actual para cuando termine el resto
-		pendientes.encolarProxima(tareaActual);
+        posponerActual();
 
-		// Recorremos desde atrás para mantener el orden
+        // Recorremos desde atrás para mantener el orden
 		for (int i = requisitos.size() - 1; i >= 0; i--) {
 			final TareaParticionable<?> requisito = requisitos.get(i);
 			prepararComoProxima(requisito);

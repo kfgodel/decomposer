@@ -14,6 +14,8 @@ package ar.com.kfgodel.decomposer.impl;
 
 import ar.com.kfgodel.diamond.api.Diamond;
 import ar.com.kfgodel.diamond.api.methods.TypeMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -30,6 +32,7 @@ import java.util.TreeMap;
  * @author D. García
  */
 public class TareaEnPasosTemplate<R> extends TareaEnPasosSupport<R> {
+    private final static Logger LOG = LoggerFactory.getLogger(TareaEnPasosTemplate.class);
 
 	/**
 	 * @see TareaEnPasosSupport#crearPasos()
@@ -37,6 +40,7 @@ public class TareaEnPasosTemplate<R> extends TareaEnPasosSupport<R> {
 	@Override
 	protected void crearPasos() {
 		final Collection<TareaPorReflection<R>> subtareas = crearTareasDesdeMetodos();
+	    LOG.trace("Adding {} methods of task[{}] as steps: {}", subtareas.size(), this, subtareas);
 		getPasos().addAll(subtareas);
 	}
 

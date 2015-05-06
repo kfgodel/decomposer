@@ -17,7 +17,7 @@ import java.lang.annotation.*;
 /**
  * Este annotation es una marca para los métodos que representan pasos de una tarea.<br>
  * Los métodos anotados con instancias de este tipo, que extienden de la clase
- * {@link TareaEnPasosTemplate} son autométicamente convertidos en sub tareas para ser ejecutadas
+ * {@link TareaEnPasosTemplate} son automáticamente convertidos en sub tareas para ser ejecutadas
  * cada vez que se ejecuta la tarea contenedora.<br>
  * Ejecutando un paso a la vez, según el orden indicado en este annotation.<br>
  * Si hay más de un método con el mismo orden de ejecución, se produce un error.<br>

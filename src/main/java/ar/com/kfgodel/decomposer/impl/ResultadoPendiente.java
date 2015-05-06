@@ -12,30 +12,22 @@
  */
 package ar.com.kfgodel.decomposer.impl;
 
+import ar.com.kfgodel.decomposer.api.ResultadoIterativo;
 import ar.com.kfgodel.tostring.ImplementedWithStringer;
 import ar.com.kfgodel.tostring.Stringer;
-import ar.com.kfgodel.decomposer.api.ResultadoIterativo;
 
 /**
  * Esta clase representa el resultado utilizable por una tarea cuando aun no tiene valor final
  * 
  * @author D. García
  */
-public class SinResultado<R> implements ResultadoIterativo<R> {
+public class ResultadoPendiente<R> implements ResultadoIterativo<R> {
 
-	private static final SinResultado<Object> instancia = new SinResultado<>();
+	private static final ResultadoPendiente<Object> instancia = new ResultadoPendiente<>();
 
 	@SuppressWarnings("unchecked")
-	public static <R> SinResultado<R> instancia() {
-		return (SinResultado<R>) instancia;
-	}
-
-	/**
-	 * @see ResultadoIterativo#quedanIteraciones()
-	 */
-	@Override
-	public boolean quedanIteraciones() {
-		return true;
+	public static <R> ResultadoPendiente<R> instancia() {
+		return (ResultadoPendiente<R>) instancia;
 	}
 
 	/**

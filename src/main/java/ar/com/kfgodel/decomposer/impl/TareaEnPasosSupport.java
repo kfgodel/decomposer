@@ -12,11 +12,12 @@
  */
 package ar.com.kfgodel.decomposer.impl;
 
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
 import ar.com.kfgodel.decomposer.api.ProcesadorDeTareasParticionables;
+import ar.com.kfgodel.decomposer.api.ResultadoIterativo;
 import ar.com.kfgodel.decomposer.api.TareaConPadre;
 import ar.com.kfgodel.decomposer.api.TareaParticionable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.List;
  * @author D. García
  */
 public class TareaEnPasosSupport<R> extends TareaParticionableSupport<R> implements TareaConPadre<R> {
+    private final static Logger LOG = LoggerFactory.getLogger(TareaEnPasosSupport.class);
 
 	private int indiceDePasoActual;
 	private TareaParticionable<R> tareaPadre;
@@ -77,8 +79,11 @@ public class TareaEnPasosSupport<R> extends TareaParticionableSupport<R> impleme
 			indiceDePasoActual = 0;
 		}
 		final TareaParticionable<R> pasoActual = getPasoActual();
+		LOG.debug("Running step {} of task[{}]: {}", indiceDePasoActual, this, pasoActual);
 		pasoActual.ejecutarCon(procesador);
-		setResultado(pasoActual.getResultado());
+        ResultadoIterativo<R> stepResult = pasoActual.getResultado();
+        LOG.trace("Using step {} result[{}] for task[{}]", indiceDePasoActual, stepResult, this);
+        setResultado(stepResult);
 		indiceDePasoActual++;
 	}
 
@@ -119,8 +124,18 @@ public class TareaEnPasosSupport<R> extends TareaParticionableSupport<R> impleme
 	 * @see TareaParticionableSupport#toString()
 	 */
 	@Override
-	@ImplementedWithStringer
 	public String toString() {
-		return Stringer.representationOf(this);
+		StringBuilder builder = new StringBuilder(this.getClass().getSimpleName());
+		builder.append("<");
+		builder.append(Integer.toHexString(this.hashCode()));
+		builder.append(">");
+		builder.append("{ steps: ");
+		builder.append(indiceDePasoActual);
+		builder.append(" of ");
+		builder.append(getPasos().size());
+		builder.append(", current: ");
+		builder.append(getPasoActual());
+		builder.append("}");
+		return builder.toString();
 	}
 }

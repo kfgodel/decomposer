@@ -12,16 +12,14 @@
  */
 package ar.com.kfgodel.decomposer.impl;
 
-import ar.com.kfgodel.diamond.api.Diamond;
-import ar.com.kfgodel.diamond.api.exceptions.DiamondException;
-import ar.com.kfgodel.diamond.api.methods.TypeMethod;
-import ar.com.kfgodel.diamond.api.types.TypeInstance;
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
 import ar.com.kfgodel.decomposer.api.ProcesadorDeTareasParticionables;
 import ar.com.kfgodel.decomposer.api.ResultadoIterativo;
 import ar.com.kfgodel.decomposer.api.TareaConPadre;
 import ar.com.kfgodel.decomposer.api.TareaParticionable;
+import ar.com.kfgodel.diamond.api.Diamond;
+import ar.com.kfgodel.diamond.api.exceptions.DiamondException;
+import ar.com.kfgodel.diamond.api.methods.TypeMethod;
+import ar.com.kfgodel.diamond.api.types.TypeInstance;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -144,8 +142,13 @@ public class TareaPorReflection<R> extends TareaParticionableSupport<R> implemen
 	 * @see TareaParticionableSupport#toString()
 	 */
 	@Override
-    @ImplementedWithStringer
 	public String toString() {
-		return Stringer.representationOf(this);
+		StringBuilder builder = new StringBuilder(this.getClass().getSimpleName());
+		builder.append("{ order: ");
+		builder.append(this.orden);
+		builder.append(", method: ");
+		builder.append(this.metodo.name());
+		builder.append("}");
+		return builder.toString();
 	}
 }

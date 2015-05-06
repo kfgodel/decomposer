@@ -12,9 +12,9 @@
  */
 package ar.com.kfgodel.decomposer.impl;
 
+import ar.com.kfgodel.decomposer.api.ResultadoIterativo;
 import ar.com.kfgodel.tostring.ImplementedWithStringer;
 import ar.com.kfgodel.tostring.Stringer;
-import ar.com.kfgodel.decomposer.api.ResultadoIterativo;
 
 /**
  * Esta clase representa el resultado que posee un valor final
@@ -25,14 +25,6 @@ public class ResultadoProducido<R> implements ResultadoIterativo<R> {
 
 	private R valorFinal;
 	public static final String valorFinal_FIELD = "valorFinal";
-
-	/**
-	 * @see ResultadoIterativo#quedanIteraciones()
-	 */
-	@Override
-	public boolean quedanIteraciones() {
-		return false;
-	}
 
 	/**
 	 * @see ResultadoIterativo#getValorFinal()

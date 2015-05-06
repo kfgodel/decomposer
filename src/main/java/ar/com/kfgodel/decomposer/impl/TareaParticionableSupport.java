@@ -12,11 +12,11 @@
  */
 package ar.com.kfgodel.decomposer.impl;
 
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
 import ar.com.kfgodel.decomposer.api.ProcesadorDeTareasParticionables;
 import ar.com.kfgodel.decomposer.api.ResultadoIterativo;
 import ar.com.kfgodel.decomposer.api.TareaParticionable;
+import ar.com.kfgodel.tostring.ImplementedWithStringer;
+import ar.com.kfgodel.tostring.Stringer;
 
 
 /**
@@ -26,7 +26,7 @@ import ar.com.kfgodel.decomposer.api.TareaParticionable;
  */
 public class TareaParticionableSupport<R> implements TareaParticionable<R> {
 
-	private ResultadoIterativo<R> resultado = SinResultado.instancia();
+	private ResultadoIterativo<R> resultado = ResultadoPendiente.instancia();
 	public static final String resultado_FIELD = "resultado";
 
 	/**

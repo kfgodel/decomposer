@@ -23,13 +23,6 @@ package ar.com.kfgodel.decomposer.api;
 public interface ResultadoIterativo<R> {
 
 	/**
-	 * Indica si este resultado ya tiene un valor final, o todavía debe seguir procesandosé
-	 * 
-	 * @return false si el resultado final es obtenible
-	 */
-	boolean quedanIteraciones();
-
-	/**
 	 * El objeto que representa el valor final de este resultado.<br>
 	 * Se produce un error si quedan iteraciones por procesar
 	 * 

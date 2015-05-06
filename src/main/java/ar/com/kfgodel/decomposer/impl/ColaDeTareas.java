@@ -12,10 +12,12 @@
  */
 package ar.com.kfgodel.decomposer.impl;
 
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
 import ar.com.kfgodel.decomposer.api.DependenciaCircularException;
 import ar.com.kfgodel.decomposer.api.TareaParticionable;
+import ar.com.kfgodel.tostring.ImplementedWithStringer;
+import ar.com.kfgodel.tostring.Stringer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -26,6 +28,7 @@ import java.util.LinkedList;
  * @author D. García
  */
 public class ColaDeTareas {
+	private final static Logger LOG = LoggerFactory.getLogger(ColaDeTareas.class);
 
 	private Deque<TareaParticionable<?>> tareas;
 	public static final String tareas_FIELD = "tareas";
@@ -58,6 +61,7 @@ public class ColaDeTareas {
 	 *            La tarea a encolar
 	 */
 	private void agregarAlInicio(final TareaParticionable<?> tareaAProcesar) {
+		LOG.trace("Enqueuing before {} others, task[{}]", this.getSize(), tareaAProcesar);
 		tareas.addFirst(tareaAProcesar);
 	}
 
@@ -91,7 +95,9 @@ public class ColaDeTareas {
 	 * @return La tarea quitada del inicio
 	 */
 	public TareaParticionable<?> sacarProxima() {
-		return tareas.pop();
+        TareaParticionable<?> tarea = tareas.pop();
+        LOG.trace("Dequeued before {} others, task[{}]", this.getSize(), tarea);
+        return tarea;
 	}
 
 	/**
