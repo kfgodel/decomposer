@@ -26,7 +26,7 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
     public void define() {
         describe("a decomposer processor", ()->{
 
-            it("can execute a task", ()->{
+            it("can execute a task", () -> {
                 DecomposableTask task = (taskContext) -> "Hola";
 
                 String taskResult = context().decomposer().process(task);
@@ -34,134 +34,213 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                 assertThat(taskResult).isEqualTo("Hola");
             });
 
-            it("can execute a sub-task returning the sub-task result", ()->{
-                DecomposableTask subTask = (subTaskContext) -> "Subtask";
+            describe("a task with sub-tasks", () -> {
 
-                DecomposableTask task = (taskContext) -> {
-                    return DelayedResult.until(subTask);
-                };
+                it("can use its sub-task result as its own result", () -> {
+                    DecomposableTask subTask = (subTaskContext) -> "Subtask";
 
-                String taskResult = context().decomposer().process(task);
+                    DecomposableTask task = (taskContext) -> {
+                        return DelayedResult.until(subTask);
+                    };
 
-                assertThat(taskResult).isEqualTo("Subtask");
+                    String taskResult = context().decomposer().process(task);
+
+                    assertThat(taskResult).isEqualTo("Subtask");
+                });
+
+                it("can use method references as sub-tasks", () -> {
+                    DecomposableTask task = (taskContext) ->
+                            DelayedResult.until(this::calculateSalutation);
+
+                    String taskResult = context().decomposer().process(task);
+
+                    assertThat(taskResult).isEqualTo("Hola Mundo!");
+                });
+
+                it("can nest any number of sub-task levels", () -> {
+                    DecomposableTask subSubTask = (subSubTaskContext) -> "Sub-Sub-Task";
+
+                    DecomposableTask subTask = (subTaskContext) -> DelayedResult.until(subSubTask);
+
+                    DecomposableTask task = (taskContext) -> DelayedResult.until(subTask);
+
+                    String taskResult = context().decomposer().process(task);
+
+                    assertThat(taskResult).isEqualTo("Sub-Sub-Task");
+
+                });
+
+                it("can return its own result regardless of the subtasks", () -> {
+                    DecomposableTask subTask = (subTaskContext) -> "Subtask";
+
+                    DecomposableTask task = (taskContext) ->
+                            DelayedResult.until(subTask)
+                                    .returning("Task");
+
+                    String taskResult = context().decomposer().process(task);
+
+                    assertThat(taskResult).isEqualTo("Task");
+                });
+
+                it("can combine its result with its subtask result", () -> {
+                    DecomposableTask subTask = (subTaskContext) -> "Subtask";
+
+                    DecomposableTask task = (taskContext) ->
+                            DelayedResult.until(subTask)
+                                    .andThen((endTaskContext) -> endTaskContext.getSubTaskResult() + " and Task");
+
+                    String taskResult = context().decomposer().process(task);
+
+                    assertThat(taskResult).isEqualTo("Subtask and Task");
+                });
+
+                it("can combine multiple sub-task results", () -> {
+                    DecomposableTask firstSubTask = (subTaskContext) -> "1";
+                    DecomposableTask secondSubTask = (subTaskContext) -> "2";
+                    DecomposableTask thirdSubTask = (subTaskContext) -> "3";
+
+                    DecomposableTask task = (taskContext) ->
+                            DelayedResult.until(firstSubTask, secondSubTask, thirdSubTask)
+                                    .andThen((endTaskContext) -> {
+                                        List<String> subTaskResults = endTaskContext.getSubTaskResults();
+                                        return subTaskResults.stream().collect(Collectors.joining(", "));
+                                    });
+
+                    String taskResult = context().decomposer().process(task);
+
+                    assertThat(taskResult).isEqualTo("1, 2, 3");
+
+                });
+
+                it("has an implicit subtask result list as result if no explicit result given", () -> {
+                    DecomposableTask firstSubTask = (subTaskContext) -> "1";
+                    DecomposableTask secondSubTask = (subTaskContext) -> "2";
+                    DecomposableTask thirdSubTask = (subTaskContext) -> "3";
+
+                    DecomposableTask task = (taskContext) ->
+                            DelayedResult.until(firstSubTask, secondSubTask, thirdSubTask);
+
+                    List<String> taskResult = context().decomposer().process(task);
+
+                    assertThat(taskResult).isEqualTo(Lists.newArrayList("1", "2", "3"));
+                });
+
+                it("continues with task end if empty sub-task list used", () -> {
+                    List<DecomposableTask> subtasks = new ArrayList<>();
+
+                    DecomposableTask task = (taskContext) ->
+                            DelayedResult.until(subtasks)
+                                    .andThen((endTaskContext) -> "Processed subtasks: " + endTaskContext.getSubTaskResults().size());
+
+                    String taskResult = context().decomposer().process(task);
+
+                    assertThat(taskResult).isEqualTo("Processed subtasks: 0");
+                });
+
+                it("produces an error if no explicit result and an empty subtask list", () -> {
+                    List<DecomposableTask> subtasks = new ArrayList<>();
+
+                    DecomposableTask task = (taskContext) ->
+                            DelayedResult.until(subtasks);
+                    try {
+                        context().decomposer().process(task);
+                        failBecauseExceptionWasNotThrown(Exception.class);
+                    } catch (Exception e) {
+                        assertThat(e.getMessage()).isEqualTo("asd");
+                    }
+                });
+
             });
 
-            it("can execute a sub-task returning its own result", ()->{
-                DecomposableTask subTask = (subTaskContext) -> "Subtask";
+            describe("task context", () -> {
 
-                DecomposableTask task = (taskContext) ->
-                        DelayedResult.until(subTask)
-                                .returning("Task");
+                it("allows sharing an object between a task and its sub-tasks", () -> {
 
-                String taskResult = context().decomposer().process(task);
+                    DecomposableTask firstSubTask = (taskContext) -> {
+                        StringBuilder builder = taskContext.getShared();
+                        builder.append("Hello");
+                        return null;
+                    };
+                    DecomposableTask secondSubTask = (taskContext) -> {
+                        StringBuilder builder = taskContext.getShared();
+                        builder.append(" World");
+                        return null;
+                    };
 
-                assertThat(taskResult).isEqualTo("Task");
-            });
-
-            it("can execute a sub-task and use its result in the task result",()->{
-                DecomposableTask subTask = (subTaskContext) -> "Subtask";
-
-                DecomposableTask task = (taskContext) ->
-                        DelayedResult.until(subTask)
-                                .andThen((endTaskContext) -> endTaskContext.getSubTaskResult() + " and Task");
-
-                String taskResult = context().decomposer().process(task);
-
-                assertThat(taskResult).isEqualTo("Subtask and Task");
-            });
-
-            it("can execute multiple sub-tasks and combine their results as the task result",()->{
-                DecomposableTask firstSubTask = (subTaskContext) -> "1";
-                DecomposableTask secondSubTask = (subTaskContext) -> "2";
-                DecomposableTask thirdSubTask = (subTaskContext) -> "3";
-
-                DecomposableTask task = (taskContext) ->
-                        DelayedResult.until(firstSubTask, secondSubTask, thirdSubTask)
+                    DecomposableTask parentTask = (taskContext) -> {
+                        StringBuilder builder = new StringBuilder();
+                        taskContext.share(builder);
+                        return DelayedResult
+                                .until(firstSubTask, secondSubTask)
                                 .andThen((endTaskContext) -> {
-                                    List<String> subTaskResults = endTaskContext.getSubTaskResults();
-                                    return subTaskResults.stream().collect(Collectors.joining(", "));
+                                    builder.append("!");
+                                    return builder.toString();
                                 });
+                    };
 
-                String taskResult = context().decomposer().process(task);
+                    String parentResult = context().decomposer().process(parentTask);
 
-                assertThat(taskResult).isEqualTo("1, 2, 3");
+                    assertThat(parentResult).isEqualTo("Hello World!");
+                });
 
-            });
+                it("a sub-task can share its own object without affecting sibling tasks",()->{
+                    DecomposableTask subSubTask = (subSubTaskContext) -> {
+                        StringBuilder childBuilder = subSubTaskContext.getShared();
+                        childBuilder.append(", 3");
+                        return null;
+                    };
+                    DecomposableTask firstSubTask = (taskContext) -> {
+                        StringBuilder parentBuilder = taskContext.getShared();
+                        parentBuilder.append("1");
 
-            it("it uses the subtask result list as task result if no explicit task result given", ()->{
-                DecomposableTask firstSubTask = (subTaskContext) -> "1";
-                DecomposableTask secondSubTask = (subTaskContext) -> "2";
-                DecomposableTask thirdSubTask = (subTaskContext) -> "3";
+                        StringBuilder ownBuilder = new StringBuilder();
+                        taskContext.share(ownBuilder);
+                        return DelayedResult.until(subSubTask);
+                    };
+                    DecomposableTask secondSubTask = (taskContext) -> {
+                        StringBuilder parentBuilder = taskContext.getShared();
+                        parentBuilder.append(", 2");
+                        return null;
+                    };
 
-                DecomposableTask task = (taskContext) ->
-                        DelayedResult.until(firstSubTask, secondSubTask, thirdSubTask);
+                    DecomposableTask parentTask = (taskContext) -> {
+                        StringBuilder builder = new StringBuilder();
+                        taskContext.share(builder);
+                        return DelayedResult
+                                .until(firstSubTask, secondSubTask)
+                                .andThen((endTaskContext) -> builder.toString());
+                    };
 
-                List<String> taskResult = context().decomposer().process(task);
+                    String parentResult = context().decomposer().process(parentTask);
 
-                assertThat(taskResult).isEqualTo(Lists.newArrayList("1","2","3"));
-            });
+                    assertThat(parentResult).isEqualTo("1, 2");
+                });
 
-            it("allows sharing an object between a task and its sub-tasks", ()-> {
+                it("if not overriden the shared object is inherited by sub-tasks", ()->{
+                    DecomposableTask subSubTask = (subSubTaskContext) -> {
+                        StringBuilder childBuilder = subSubTaskContext.getShared();
+                        childBuilder.append(", 3");
+                        return null;
+                    };
+                    DecomposableTask firstSubTask = (taskContext) -> {
+                        StringBuilder parentBuilder = taskContext.getShared();
+                        parentBuilder.append("1");
+                        return DelayedResult.until(subSubTask);
+                    };
 
-                DecomposableTask firstSubTask = (taskContext)->{
-                    StringBuilder builder = taskContext.getShared();
-                    builder.append("Hello");
-                    return null;
-                };
-                DecomposableTask secondSubTask = (taskContext)->{
-                    StringBuilder builder = taskContext.getShared();
-                    builder.append(" World");
-                    return null;
-                };
+                    DecomposableTask parentTask = (taskContext) -> {
+                        StringBuilder builder = new StringBuilder();
+                        taskContext.share(builder);
+                        return DelayedResult
+                                .until(firstSubTask)
+                                .andThen((endTaskContext) -> builder.toString());
+                    };
 
-                DecomposableTask parentTask = (taskContext)->{
-                    StringBuilder builder = new StringBuilder();
-                    taskContext.share(builder);
-                    return DelayedResult
-                            .until(firstSubTask, secondSubTask)
-                            .andThen((endTaskContext) -> {
-                                builder.append("!");
-                                return builder.toString();
-                            });
-                };
+                    String parentResult = context().decomposer().process(parentTask);
 
-                String parentResult = context().decomposer().process(parentTask);
+                    assertThat(parentResult).isEqualTo("1, 3");
+                });
 
-                assertThat(parentResult).isEqualTo("Hello World!");
-            });
-
-            it("allows to use method references as sub-tasks",()->{
-                DecomposableTask task = (taskContext) ->
-                        DelayedResult.until(this::calculateSalutation);
-
-                String taskResult = context().decomposer().process(task);
-
-                assertThat(taskResult).isEqualTo("Hola Mundo!");
-            });
-
-            it("continues with task if empty sub-task list",()->{
-                List<DecomposableTask> subtasks = new ArrayList<>();
-
-                DecomposableTask task = (taskContext) ->
-                        DelayedResult.until(subtasks)
-                                .andThen((endTaskContext)-> "Processed subtasks: " + endTaskContext.getSubTaskResults().size() );
-
-                String taskResult = context().decomposer().process(task);
-
-                assertThat(taskResult).isEqualTo("Processed subtasks: 0");
-            });
-
-            it("produces an error if no explicit result and an empty subtask list", ()->{
-                List<DecomposableTask> subtasks = new ArrayList<>();
-
-                DecomposableTask task = (taskContext) ->
-                        DelayedResult.until(subtasks);
-                try{
-                    context().decomposer().process(task);
-                    failBecauseExceptionWasNotThrown(Exception.class);
-                }catch(Exception e){
-                    assertThat(e.getMessage()).isEqualTo("asd");
-                }
             });
 
         });
