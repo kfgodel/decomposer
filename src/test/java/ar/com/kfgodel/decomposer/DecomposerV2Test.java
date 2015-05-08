@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -110,7 +112,7 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
                                 .andFinally((nestingTaskContext) -> {
                                     nestingTaskContext.share(nestingTaskContext.getSubTaskResult());
                                     return DelayResult.waitingFor(nestedFinalTask)
-                                            .andFinally((endTaskContext)-> endTaskContext.getShared().toString());
+                                            .andFinally((endTaskContext) -> endTaskContext.getShared().toString());
                                 });
                     };
 
@@ -175,7 +177,23 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
                     }
                 });
 
-                it("can detect circular dependency with its sub-tasks");
+                it("can execute the same task in a loop like", () -> {
+                    AtomicInteger counter = new AtomicInteger(10);
+
+                    // Needed for the lambdaish task to reference itself
+                    AtomicReference<DecomposableTask> taskAutoReference = new AtomicReference<DecomposableTask>();
+                    taskAutoReference.set((taskContext) -> {
+                        if (counter.decrementAndGet() == 0) {
+                            return "Finished";
+                        }
+                        return DelayResult.waitingFor(taskAutoReference.get());
+                    });
+
+                    String taskResult = context().decomposer().process(taskAutoReference.get());
+
+                    assertThat(taskResult).isEqualTo("Finished");
+
+                });
 
             });
 
