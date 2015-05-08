@@ -4,7 +4,9 @@ import ar.com.dgarcia.javaspec.api.JavaSpec;
 import ar.com.dgarcia.javaspec.api.JavaSpecRunner;
 import ar.com.kfgodel.decomposer.api.v2.DecomposableTask;
 import ar.com.kfgodel.decomposer.api.v2.DecomposedContext;
-import ar.com.kfgodel.decomposer.api.v2.DelayedResult;
+import ar.com.kfgodel.decomposer.api.v2.DecomposerException;
+import ar.com.kfgodel.decomposer.api.v2.DelayResult;
+import ar.com.kfgodel.decomposer.impl.v2.DecomposerProcessor;
 import org.assertj.core.util.Lists;
 import org.junit.runner.RunWith;
 
@@ -20,11 +22,13 @@ import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
  * Created by kfgodel on 06/05/2015.
  */
 @RunWith(JavaSpecRunner.class)
-public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
+public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
 
     @Override
     public void define() {
         describe("a decomposer processor", ()->{
+
+            context().decomposer(DecomposerProcessor::create);
 
             it("can execute a task", () -> {
                 DecomposableTask task = (taskContext) -> "Hola";
@@ -40,7 +44,7 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     DecomposableTask subTask = (subTaskContext) -> "Subtask";
 
                     DecomposableTask task = (taskContext) -> {
-                        return DelayedResult.until(subTask);
+                        return DelayResult.waitingFor(subTask);
                     };
 
                     String taskResult = context().decomposer().process(task);
@@ -50,7 +54,7 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
 
                 it("can use method references as sub-tasks", () -> {
                     DecomposableTask task = (taskContext) ->
-                            DelayedResult.until(this::calculateSalutation);
+                            DelayResult.waitingFor(this::calculateSalutation);
 
                     String taskResult = context().decomposer().process(task);
 
@@ -60,9 +64,9 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                 it("can nest any number of sub-task levels", () -> {
                     DecomposableTask subSubTask = (subSubTaskContext) -> "Sub-Sub-Task";
 
-                    DecomposableTask subTask = (subTaskContext) -> DelayedResult.until(subSubTask);
+                    DecomposableTask subTask = (subTaskContext) -> DelayResult.waitingFor(subSubTask);
 
-                    DecomposableTask task = (taskContext) -> DelayedResult.until(subTask);
+                    DecomposableTask task = (taskContext) -> DelayResult.waitingFor(subTask);
 
                     String taskResult = context().decomposer().process(task);
 
@@ -74,7 +78,7 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     DecomposableTask subTask = (subTaskContext) -> "Subtask";
 
                     DecomposableTask task = (taskContext) ->
-                            DelayedResult.until(subTask)
+                            DelayResult.waitingFor(subTask)
                                     .returning("Task");
 
                     String taskResult = context().decomposer().process(task);
@@ -86,13 +90,15 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     DecomposableTask subTask = (subTaskContext) -> "Subtask";
 
                     DecomposableTask task = (taskContext) ->
-                            DelayedResult.until(subTask)
-                                    .andThen((endTaskContext) -> endTaskContext.getSubTaskResult() + " and Task");
+                            DelayResult.waitingFor(subTask)
+                                    .andFinally((endTaskContext) -> endTaskContext.getSubTaskResult() + " and Task");
 
                     String taskResult = context().decomposer().process(task);
 
                     assertThat(taskResult).isEqualTo("Subtask and Task");
                 });
+
+                it("can nest also in the combinator task");
 
                 it("can combine multiple sub-task results", () -> {
                     DecomposableTask firstSubTask = (subTaskContext) -> "1";
@@ -100,8 +106,8 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     DecomposableTask thirdSubTask = (subTaskContext) -> "3";
 
                     DecomposableTask task = (taskContext) ->
-                            DelayedResult.until(firstSubTask, secondSubTask, thirdSubTask)
-                                    .andThen((endTaskContext) -> {
+                            DelayResult.waitingFor(firstSubTask, secondSubTask, thirdSubTask)
+                                    .andFinally((endTaskContext) -> {
                                         List<String> subTaskResults = endTaskContext.getSubTaskResults();
                                         return subTaskResults.stream().collect(Collectors.joining(", "));
                                     });
@@ -118,7 +124,7 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     DecomposableTask thirdSubTask = (subTaskContext) -> "3";
 
                     DecomposableTask task = (taskContext) ->
-                            DelayedResult.until(firstSubTask, secondSubTask, thirdSubTask);
+                            DelayResult.waitingFor(firstSubTask, secondSubTask, thirdSubTask);
 
                     List<String> taskResult = context().decomposer().process(task);
 
@@ -129,8 +135,8 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     List<DecomposableTask> subtasks = new ArrayList<>();
 
                     DecomposableTask task = (taskContext) ->
-                            DelayedResult.until(subtasks)
-                                    .andThen((endTaskContext) -> "Processed subtasks: " + endTaskContext.getSubTaskResults().size());
+                            DelayResult.waitingFor(subtasks)
+                                    .andFinally((endTaskContext) -> "Processed subtasks: " + endTaskContext.getSubTaskResults().size());
 
                     String taskResult = context().decomposer().process(task);
 
@@ -141,12 +147,12 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     List<DecomposableTask> subtasks = new ArrayList<>();
 
                     DecomposableTask task = (taskContext) ->
-                            DelayedResult.until(subtasks);
+                            DelayResult.waitingFor(subtasks);
                     try {
                         context().decomposer().process(task);
-                        failBecauseExceptionWasNotThrown(Exception.class);
-                    } catch (Exception e) {
-                        assertThat(e.getMessage()).isEqualTo("asd");
+                        failBecauseExceptionWasNotThrown(DecomposerException.class);
+                    } catch (DecomposerException e) {
+                        assertThat(e.getMessage()).isEqualTo("There's no result available because it was delayed to an empty sub-task list");
                     }
                 });
 
@@ -170,9 +176,9 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     DecomposableTask parentTask = (taskContext) -> {
                         StringBuilder builder = new StringBuilder();
                         taskContext.share(builder);
-                        return DelayedResult
-                                .until(firstSubTask, secondSubTask)
-                                .andThen((endTaskContext) -> {
+                        return DelayResult
+                                .waitingFor(firstSubTask, secondSubTask)
+                                .andFinally((endTaskContext) -> {
                                     builder.append("!");
                                     return builder.toString();
                                 });
@@ -183,7 +189,7 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     assertThat(parentResult).isEqualTo("Hello World!");
                 });
 
-                it("a sub-task can share its own object without affecting sibling tasks",()->{
+                it("a sub-task can share its own object without affecting sibling tasks", () -> {
                     DecomposableTask subSubTask = (subSubTaskContext) -> {
                         StringBuilder childBuilder = subSubTaskContext.getShared();
                         childBuilder.append(", 3");
@@ -195,7 +201,7 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
 
                         StringBuilder ownBuilder = new StringBuilder();
                         taskContext.share(ownBuilder);
-                        return DelayedResult.until(subSubTask);
+                        return DelayResult.waitingFor(subSubTask);
                     };
                     DecomposableTask secondSubTask = (taskContext) -> {
                         StringBuilder parentBuilder = taskContext.getShared();
@@ -206,9 +212,9 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     DecomposableTask parentTask = (taskContext) -> {
                         StringBuilder builder = new StringBuilder();
                         taskContext.share(builder);
-                        return DelayedResult
-                                .until(firstSubTask, secondSubTask)
-                                .andThen((endTaskContext) -> builder.toString());
+                        return DelayResult
+                                .waitingFor(firstSubTask, secondSubTask)
+                                .andFinally((endTaskContext) -> builder.toString());
                     };
 
                     String parentResult = context().decomposer().process(parentTask);
@@ -216,7 +222,7 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     assertThat(parentResult).isEqualTo("1, 2");
                 });
 
-                it("if not overriden the shared object is inherited by sub-tasks", ()->{
+                it("if not overriden the shared object is inherited by sub-tasks", () -> {
                     DecomposableTask subSubTask = (subSubTaskContext) -> {
                         StringBuilder childBuilder = subSubTaskContext.getShared();
                         childBuilder.append(", 3");
@@ -225,15 +231,15 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     DecomposableTask firstSubTask = (taskContext) -> {
                         StringBuilder parentBuilder = taskContext.getShared();
                         parentBuilder.append("1");
-                        return DelayedResult.until(subSubTask);
+                        return DelayResult.waitingFor(subSubTask);
                     };
 
                     DecomposableTask parentTask = (taskContext) -> {
                         StringBuilder builder = new StringBuilder();
                         taskContext.share(builder);
-                        return DelayedResult
-                                .until(firstSubTask)
-                                .andThen((endTaskContext) -> builder.toString());
+                        return DelayResult
+                                .waitingFor(firstSubTask)
+                                .andFinally((endTaskContext) -> builder.toString());
                     };
 
                     String parentResult = context().decomposer().process(parentTask);
@@ -241,6 +247,7 @@ public class TaskBranchingTest extends JavaSpec<DecomposerTestContext> {
                     assertThat(parentResult).isEqualTo("1, 3");
                 });
 
+                it("the shared object is inherited by the combinator task");
             });
 
         });
