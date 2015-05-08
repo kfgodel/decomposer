@@ -98,7 +98,26 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
                     assertThat(taskResult).isEqualTo("Subtask and Task");
                 });
 
-                it("can nest also in the combinator task");
+                it("can nest also in the combinator task", () -> {
+                    DecomposableTask nestedFinalTask = (nestedTaskContext) -> {
+                        StringBuilder outerBuilder = nestedTaskContext.getShared();
+                        outerBuilder.append("Hello");
+                        return null;
+                    };
+
+                    DecomposableTask task = taskContext -> {
+                        return DelayResult.waitingFor((subTaskContext) -> new StringBuilder())
+                                .andFinally((nestingTaskContext) -> {
+                                    nestingTaskContext.share(nestingTaskContext.getSubTaskResult());
+                                    return DelayResult.waitingFor(nestedFinalTask)
+                                            .andFinally((endTaskContext)-> endTaskContext.getShared().toString());
+                                });
+                    };
+
+                    String taskResult = context().decomposer().process(task);
+
+                    assertThat(taskResult).isEqualTo("Hello");
+                });
 
                 it("can combine multiple sub-task results", () -> {
                     DecomposableTask firstSubTask = (subTaskContext) -> "1";
@@ -247,7 +266,6 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
                     assertThat(parentResult).isEqualTo("1, 3");
                 });
 
-                it("the shared object is inherited by the combinator task");
             });
 
         });
