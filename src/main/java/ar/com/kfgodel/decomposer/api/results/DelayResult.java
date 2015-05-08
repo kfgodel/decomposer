@@ -1,9 +1,9 @@
 package ar.com.kfgodel.decomposer.api.results;
 
 import ar.com.kfgodel.decomposer.api.DecomposableTask;
-import ar.com.kfgodel.decomposer.impl.results.MultiPrerequisiteResult;
-import ar.com.kfgodel.decomposer.impl.results.NoPrerequisitesResult;
-import ar.com.kfgodel.decomposer.impl.results.OnePrerequisiteResult;
+import ar.com.kfgodel.decomposer.impl.results.subtasks.MultiPrerequisiteResult;
+import ar.com.kfgodel.decomposer.impl.results.subtasks.NoPrerequisitesResult;
+import ar.com.kfgodel.decomposer.impl.results.subtasks.OnePrerequisiteResult;
 
 import java.util.Arrays;
 import java.util.List;

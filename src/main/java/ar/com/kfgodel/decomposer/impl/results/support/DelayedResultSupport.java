@@ -8,7 +8,7 @@ import ar.com.kfgodel.tostring.ImplementedWithStringer;
 import ar.com.kfgodel.tostring.Stringer;
 
 /**
- * This type serves as a base class for implementing delayed task with common behavior pre-defined
+ * This type serves as a base class for implementing delayed tasks
  * Created by kfgodel on 08/05/2015.
  */
 public abstract class DelayedResultSupport implements DelayedResult {

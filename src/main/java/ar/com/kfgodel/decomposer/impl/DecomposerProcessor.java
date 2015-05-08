@@ -30,7 +30,7 @@ public class DecomposerProcessor implements Decomposer {
             executionStack.push(additionalTasks);
         }
 
-        Object taskResult = rootExecution.getEndResult();
+        Object taskResult = rootExecution.getResultValue();
         return (R) taskResult;
     }
 

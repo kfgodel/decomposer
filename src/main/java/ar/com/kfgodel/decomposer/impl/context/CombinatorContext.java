@@ -35,7 +35,7 @@ public class CombinatorContext extends NonRootContextSupport {
     @Override
     public <R> List<R> getSubTaskResults() {
         List previousResults = combinableExecutions.stream()
-                .map(TaskExecution::getEndResult)
+                .map(TaskExecution::getResultValue)
                 .collect(Collectors.toList());
         return previousResults;
     }

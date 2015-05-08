@@ -1,4 +1,4 @@
-package ar.com.kfgodel.decomposer.impl.results;
+package ar.com.kfgodel.decomposer.impl.results.subtasks;
 
 import ar.com.kfgodel.decomposer.api.DecomposableTask;
 import ar.com.kfgodel.decomposer.api.context.DecomposedContext;
@@ -27,7 +27,7 @@ public class OnePrerequisiteResult extends DelayedResultSupport {
 
     @Override
     public Object get() {
-        return this.prerequisiteExecution.getEndResult();
+        return this.prerequisiteExecution.getResultValue();
     }
 
     public static OnePrerequisiteResult create(DecomposableTask prerequisite) {

@@ -6,7 +6,7 @@ import ar.com.kfgodel.decomposer.impl.context.support.NonRootContextSupport;
 import java.util.List;
 
 /**
- * This type represents the execution context of a prerequisite task
+ * This type represents the execution context of a subtask
  *
  * Created by kfgodel on 07/05/2015.
  */

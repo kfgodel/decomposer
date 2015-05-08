@@ -1,4 +1,4 @@
-package ar.com.kfgodel.decomposer.impl.results;
+package ar.com.kfgodel.decomposer.impl.results.subtasks;
 
 import ar.com.kfgodel.decomposer.api.DecomposableTask;
 import ar.com.kfgodel.decomposer.api.context.DecomposedContext;
@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 /**
  * This type represents a delayed result that depends on several subtasks
+ * to create a list with all the subtask results as the final result
  *
  * Created by kfgodel on 07/05/2015.
  */
@@ -40,7 +41,7 @@ public class MultiPrerequisiteResult extends DelayedResultSupport {
     public Object get() {
         // The result supplied is the list of all child tasks results
         return prerequisiteExecutions.stream()
-                .map(TaskExecution::getEndResult)
+                .map(TaskExecution::getResultValue)
                 .collect(Collectors.toList());
     }
 

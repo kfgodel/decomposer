@@ -52,7 +52,7 @@ public class CombinedResult implements DelayedResult {
 
     @Override
     public Object get() {
-        return combinatorExecution.getEndResult();
+        return combinatorExecution.getResultValue();
     }
 
     @Override

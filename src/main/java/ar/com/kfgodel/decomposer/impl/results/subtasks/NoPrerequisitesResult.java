@@ -1,4 +1,4 @@
-package ar.com.kfgodel.decomposer.impl.results;
+package ar.com.kfgodel.decomposer.impl.results.subtasks;
 
 import ar.com.kfgodel.decomposer.api.DecomposerException;
 import ar.com.kfgodel.decomposer.api.context.DecomposedContext;
@@ -10,6 +10,9 @@ import java.util.List;
 
 /**
  * This type represents a delayed result that has no dependency on subtasks
+ * to produce the end result. <br>
+ * It's a useful case for tasks that depend on an unknown number of subtasks,
+ * and sometimes that number is 0.
  *
  * Created by kfgodel on 07/05/2015.
  */

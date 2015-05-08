@@ -13,8 +13,10 @@ import java.util.function.Supplier;
 
 /**
  * This type represents the execution of a single task keeping a reference to the task result.<br>
- *     This object is used to execute the actual task, but wait for the end result to be accessed only
- *     when sub tasks are processed first
+ * <br>
+ * This object is used to execute the actual task, but wait for the end result to be accessed only
+ * when sub tasks are processed first
+ *
  * Created by kfgodel on 07/05/2015.
  */
 public class TaskExecution {
@@ -30,12 +32,21 @@ public class TaskExecution {
         return execution;
     }
 
+    /**
+     * Executes the task with the defined context returning the list of pending
+     * executions to fulfill before accessing this execution result
+     * @return The list of prerequisite executions
+     */
     public List<TaskExecution> execute() {
         TaskResult taskResult = executeWithContextAndGetResult();
         this.resultSupplier = taskResult;
         return taskResult.createPrerequisiteExecutions(this.context);
     }
 
+    /**
+     * Executes the task and interprets the result based on its type (delayed or not)
+     * @return The task result description
+     */
     private TaskResult executeWithContextAndGetResult() {
         Object returnedObject = task.executeUnder(context);
         TaskResult taskResult;
@@ -47,7 +58,10 @@ public class TaskExecution {
         return taskResult;
     }
 
-    public Object getEndResult() {
+    /**
+     * @return The final value produced by the task execution
+     */
+    public Object getResultValue() {
         if(resultSupplier == null){
             throw new IllegalStateException("There's no task result defined and one is requested");
         }
