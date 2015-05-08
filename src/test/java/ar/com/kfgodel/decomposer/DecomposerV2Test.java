@@ -2,11 +2,11 @@ package ar.com.kfgodel.decomposer;
 
 import ar.com.dgarcia.javaspec.api.JavaSpec;
 import ar.com.dgarcia.javaspec.api.JavaSpecRunner;
-import ar.com.kfgodel.decomposer.api.v2.DecomposableTask;
-import ar.com.kfgodel.decomposer.api.v2.DecomposedContext;
-import ar.com.kfgodel.decomposer.api.v2.DecomposerException;
-import ar.com.kfgodel.decomposer.api.v2.DelayResult;
-import ar.com.kfgodel.decomposer.impl.v2.DecomposerProcessor;
+import ar.com.kfgodel.decomposer.api.DecomposableTask;
+import ar.com.kfgodel.decomposer.api.DecomposerException;
+import ar.com.kfgodel.decomposer.api.context.DecomposedContext;
+import ar.com.kfgodel.decomposer.api.results.DelayResult;
+import ar.com.kfgodel.decomposer.impl.DecomposerProcessor;
 import org.assertj.core.util.Lists;
 import org.junit.runner.RunWith;
 
@@ -63,20 +63,8 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
                     assertThat(taskResult).isEqualTo("Hola Mundo!");
                 });
 
-                it("can nest any number of sub-task levels", () -> {
-                    DecomposableTask subSubTask = (subSubTaskContext) -> "Sub-Sub-Task";
 
-                    DecomposableTask subTask = (subTaskContext) -> DelayResult.waitingFor(subSubTask);
-
-                    DecomposableTask task = (taskContext) -> DelayResult.waitingFor(subTask);
-
-                    String taskResult = context().decomposer().process(task);
-
-                    assertThat(taskResult).isEqualTo("Sub-Sub-Task");
-
-                });
-
-                it("can return its own result regardless of the subtasks", () -> {
+                it("can return its own result regardless of the subtask results", () -> {
                     DecomposableTask subTask = (subTaskContext) -> "Subtask";
 
                     DecomposableTask task = (taskContext) ->
@@ -93,32 +81,12 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
 
                     DecomposableTask task = (taskContext) ->
                             DelayResult.waitingFor(subTask)
-                                    .andFinally((endTaskContext) -> endTaskContext.getSubTaskResult() + " and Task");
+                                    .andFinally((combinatorContext) ->
+                                            combinatorContext.getSubTaskResult() + " and Task");
 
                     String taskResult = context().decomposer().process(task);
 
                     assertThat(taskResult).isEqualTo("Subtask and Task");
-                });
-
-                it("can nest also in the combinator task", () -> {
-                    DecomposableTask nestedFinalTask = (nestedTaskContext) -> {
-                        StringBuilder outerBuilder = nestedTaskContext.getShared();
-                        outerBuilder.append("Hello");
-                        return null;
-                    };
-
-                    DecomposableTask task = taskContext -> {
-                        return DelayResult.waitingFor((subTaskContext) -> new StringBuilder())
-                                .andFinally((nestingTaskContext) -> {
-                                    nestingTaskContext.share(nestingTaskContext.getSubTaskResult());
-                                    return DelayResult.waitingFor(nestedFinalTask)
-                                            .andFinally((endTaskContext) -> endTaskContext.getShared().toString());
-                                });
-                    };
-
-                    String taskResult = context().decomposer().process(task);
-
-                    assertThat(taskResult).isEqualTo("Hello");
                 });
 
                 it("can combine multiple sub-task results", () -> {
@@ -128,8 +96,8 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
 
                     DecomposableTask task = (taskContext) ->
                             DelayResult.waitingFor(firstSubTask, secondSubTask, thirdSubTask)
-                                    .andFinally((endTaskContext) -> {
-                                        List<String> subTaskResults = endTaskContext.getSubTaskResults();
+                                    .andFinally((combinatorContext) -> {
+                                        List<String> subTaskResults = combinatorContext.getSubTaskResults();
                                         return subTaskResults.stream().collect(Collectors.joining(", "));
                                     });
 
@@ -157,7 +125,7 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
 
                     DecomposableTask task = (taskContext) ->
                             DelayResult.waitingFor(subtasks)
-                                    .andFinally((endTaskContext) -> "Processed subtasks: " + endTaskContext.getSubTaskResults().size());
+                                    .andFinally((combinatorContext) -> "Processed subtasks: " + combinatorContext.getSubTaskResults().size());
 
                     String taskResult = context().decomposer().process(task);
 
@@ -177,24 +145,76 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
                     }
                 });
 
-                it("can execute the same task in a loop like", () -> {
-                    AtomicInteger counter = new AtomicInteger(10);
+                describe("nesting", () -> {
+                    it("can span any number of sub-task levels", () -> {
+                        DecomposableTask subSubTask = (subSubTaskContext) -> "Sub-Sub-Task";
 
-                    // Needed for the lambdaish task to reference itself
-                    AtomicReference<DecomposableTask> taskAutoReference = new AtomicReference<DecomposableTask>();
-                    taskAutoReference.set((taskContext) -> {
-                        if (counter.decrementAndGet() == 0) {
-                            return "Finished";
-                        }
-                        return DelayResult.waitingFor(taskAutoReference.get());
+                        DecomposableTask subTask = (subTaskContext) -> DelayResult.waitingFor(subSubTask);
+
+                        DecomposableTask task = (taskContext) -> DelayResult.waitingFor(subTask);
+
+                        String taskResult = context().decomposer().process(task);
+
+                        assertThat(taskResult).isEqualTo("Sub-Sub-Task");
+
                     });
 
-                    String taskResult = context().decomposer().process(taskAutoReference.get());
+                    it("even in the combinator task", () -> {
+                        DecomposableTask nestedFinalTask = (nestedTaskContext) -> {
+                            StringBuilder outerBuilder = nestedTaskContext.getShared();
+                            outerBuilder.append("Hello");
+                            return null;
+                        };
 
-                    assertThat(taskResult).isEqualTo("Finished");
+                        DecomposableTask task = taskContext -> {
+                            return DelayResult.waitingFor((subTaskContext) -> new StringBuilder())
+                                    .andFinally((nestingTaskContext) -> {
+                                        nestingTaskContext.share(nestingTaskContext.getSubTaskResult());
+                                        return DelayResult.waitingFor(nestedFinalTask)
+                                                .andFinally((endTaskContext) -> endTaskContext.getShared().toString());
+                                    });
+                        };
+
+                        String taskResult = context().decomposer().process(task);
+
+                        assertThat(taskResult).isEqualTo("Hello");
+                    });
+
+                    it("can execute the same task in a loop like", () -> {
+                        AtomicInteger counter = new AtomicInteger(10);
+
+                        // Needed for the lambdaish task to reference itself
+                        AtomicReference<DecomposableTask> taskAutoReference = new AtomicReference<DecomposableTask>();
+                        taskAutoReference.set((taskContext) -> {
+                            if (counter.decrementAndGet() == 0) {
+                                return "Finished";
+                            }
+                            return DelayResult.waitingFor(taskAutoReference.get());
+                        });
+
+                        String taskResult = context().decomposer().process(taskAutoReference.get());
+
+                        assertThat(taskResult).isEqualTo("Finished");
+
+                    });
+
+                    it("inherits parent subtask results from the combinator context", () -> {
+                        DecomposableTask subTask = (subContext) -> "A result";
+
+                        DecomposableTask nestedTask = (nestedContext)->
+                                "Subtask results: " + nestedContext.getSubTaskResults().size();
+
+                        DecomposableTask rootTask = (rootContext) ->
+                                DelayResult.waitingFor(subTask)
+                                        .andFinally((combinatorContext) ->
+                                                DelayResult.waitingFor(nestedTask));
+
+                        String taskResult = context().decomposer().process(rootTask);
+
+                        assertThat(taskResult).isEqualTo("Subtask results: 1");
+                    });
 
                 });
-
             });
 
             describe("task context", () -> {
@@ -217,7 +237,7 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
                         taskContext.share(builder);
                         return DelayResult
                                 .waitingFor(firstSubTask, secondSubTask)
-                                .andFinally((endTaskContext) -> {
+                                .andFinally((combinatorContext) -> {
                                     builder.append("!");
                                     return builder.toString();
                                 });
@@ -253,7 +273,7 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
                         taskContext.share(builder);
                         return DelayResult
                                 .waitingFor(firstSubTask, secondSubTask)
-                                .andFinally((endTaskContext) -> builder.toString());
+                                .andFinally((combinatorContext) -> builder.toString());
                     };
 
                     String parentResult = context().decomposer().process(parentTask);
@@ -278,7 +298,7 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
                         taskContext.share(builder);
                         return DelayResult
                                 .waitingFor(firstSubTask)
-                                .andFinally((endTaskContext) -> builder.toString());
+                                .andFinally((combinatorContext) -> builder.toString());
                     };
 
                     String parentResult = context().decomposer().process(parentTask);

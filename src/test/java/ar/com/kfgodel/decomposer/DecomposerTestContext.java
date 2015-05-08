@@ -1,8 +1,8 @@
 package ar.com.kfgodel.decomposer;
 
 import ar.com.dgarcia.javaspec.api.TestContext;
-import ar.com.kfgodel.decomposer.api.v2.Decomposer;
-import ar.com.kfgodel.decomposer.impl.ProcesadorDeParticionables;
+import ar.com.kfgodel.decomposer.api.Decomposer;
+import ar.com.kfgodel.decomposer.old.impl.ProcesadorDeParticionables;
 
 import java.util.function.Supplier;
 

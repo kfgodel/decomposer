@@ -12,9 +12,9 @@
  */
 package ar.com.kfgodel.decomposer;
 
-import ar.com.kfgodel.decomposer.api.ProcesadorDeTareasParticionables;
-import ar.com.kfgodel.decomposer.api.TareaParticionable;
-import ar.com.kfgodel.decomposer.impl.TareaParticionableSupport;
+import ar.com.kfgodel.decomposer.old.api.ProcesadorDeTareasParticionables;
+import ar.com.kfgodel.decomposer.old.api.TareaParticionable;
+import ar.com.kfgodel.decomposer.old.impl.TareaParticionableSupport;
 import ar.com.kfgodel.tostring.ImplementedWithStringer;
 import ar.com.kfgodel.tostring.Stringer;
 

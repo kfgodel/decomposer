@@ -2,11 +2,11 @@ package ar.com.kfgodel.decomposer;
 
 import ar.com.dgarcia.javaspec.api.JavaSpec;
 import ar.com.dgarcia.javaspec.api.JavaSpecRunner;
-import ar.com.kfgodel.decomposer.api.DependenciaCircularException;
-import ar.com.kfgodel.decomposer.api.ProcesadorDeTareasParticionables;
-import ar.com.kfgodel.decomposer.api.ResultadoIterativo;
-import ar.com.kfgodel.decomposer.api.TareaParticionable;
-import ar.com.kfgodel.decomposer.impl.*;
+import ar.com.kfgodel.decomposer.old.api.DependenciaCircularException;
+import ar.com.kfgodel.decomposer.old.api.ProcesadorDeTareasParticionables;
+import ar.com.kfgodel.decomposer.old.api.ResultadoIterativo;
+import ar.com.kfgodel.decomposer.old.api.TareaParticionable;
+import ar.com.kfgodel.decomposer.old.impl.*;
 import com.google.common.collect.Lists;
 import org.junit.runner.RunWith;
 
