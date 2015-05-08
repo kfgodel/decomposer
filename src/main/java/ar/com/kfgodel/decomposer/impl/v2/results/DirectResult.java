@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * This type represents a task result that doesn't require extra task processing.
- * The result id the object returned by the task
+ * The result is already defined and no wait is needed
  *
  * Created by kfgodel on 07/05/2015.
  */
@@ -24,7 +24,7 @@ public class DirectResult implements TaskResult {
     }
 
     @Override
-    public List<TaskExecution> getPrerequisites(DecomposedContext parentContext) {
+    public List<TaskExecution> createPrerequisiteExecutions(DecomposedContext parentContext) {
         return Collections.emptyList();
     }
 

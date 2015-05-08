@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
+ * This type represents the execution of a single task keeping a reference to the task result.<br>
+ *     This object is used to execute the actual task, but wait for the end result to be accessed only
+ *     when sub tasks are processed first
  * Created by kfgodel on 07/05/2015.
  */
 public class TaskExecution {
@@ -30,7 +33,7 @@ public class TaskExecution {
     public List<TaskExecution> execute() {
         TaskResult taskResult = executeWithContextAndGetResult();
         this.resultSupplier = taskResult;
-        return taskResult.getPrerequisites(this.context);
+        return taskResult.createPrerequisiteExecutions(this.context);
     }
 
     private TaskResult executeWithContextAndGetResult() {

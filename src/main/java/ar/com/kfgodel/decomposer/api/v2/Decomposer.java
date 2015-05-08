@@ -8,5 +8,17 @@ package ar.com.kfgodel.decomposer.api.v2;
  * Created by kfgodel on 06/05/2015.
  */
 public interface Decomposer {
-    <R> R process(DecomposableTask task);
+    /**
+     * Executes the given task in this thread and returns its final value. <br>
+     *     As the task can spawn sub tasks using DelayedResult as returned object, this
+     *     processor will execute every spawned task before accesing the end result and
+     *     returning it
+     * @param task The task to execute
+     * @param <R> The expected result type
+     * @return The result obtained from the task execution
+     * @throws DecomposerException If a result is not produced (due to invalid delayed result),
+     * an incorrect access to subtask results is performed, wrong access to shared objects
+     * or cyclic dependency between task is detected
+     */
+    <R> R process(DecomposableTask task) throws DecomposerException;
 }

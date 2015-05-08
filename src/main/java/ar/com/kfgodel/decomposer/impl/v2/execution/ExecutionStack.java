@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * This type represents the execution stack used to keep track of pending executions
+ *
  * Created by kfgodel on 07/05/2015.
  */
 public class ExecutionStack {

@@ -175,6 +175,8 @@ public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
                     }
                 });
 
+                it("can detect circular dependency with its sub-tasks");
+
             });
 
             describe("task context", () -> {

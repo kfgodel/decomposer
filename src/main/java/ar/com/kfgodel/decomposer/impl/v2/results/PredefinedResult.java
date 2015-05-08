@@ -11,7 +11,8 @@ import ar.com.kfgodel.tostring.Stringer;
 import java.util.List;
 
 /**
- * This type represents a delayed result whose end value is already defined
+ * This type represents a delayed result whose value is already defined,
+ * but it must wait for subtasks to finish
  *
  * Created by kfgodel on 07/05/2015.
  */
@@ -32,8 +33,8 @@ public class PredefinedResult implements DelayedResult {
     }
 
     @Override
-    public List<TaskExecution> getPrerequisites(DecomposedContext parentContext) {
-        return prerequisite.getPrerequisites(parentContext);
+    public List<TaskExecution> createPrerequisiteExecutions(DecomposedContext parentContext) {
+        return prerequisite.createPrerequisiteExecutions(parentContext);
     }
 
     public static PredefinedResult create(DelayedResult prerequisite, Object predefinedValue) {

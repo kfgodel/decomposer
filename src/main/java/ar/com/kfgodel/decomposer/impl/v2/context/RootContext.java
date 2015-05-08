@@ -1,31 +1,15 @@
 package ar.com.kfgodel.decomposer.impl.v2.context;
 
-import ar.com.kfgodel.decomposer.api.v2.DecomposedContext;
 import ar.com.kfgodel.decomposer.api.v2.DecomposerException;
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
+import ar.com.kfgodel.decomposer.impl.v2.context.support.ContextSupport;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
+ * This type represents the context of execution of the first processed task
  * Created by kfgodel on 07/05/2015.
  */
-public class RootContext implements DecomposedContext {
-
-    private Supplier<Object> sharedObject;
-    @Override
-    public void share(Object sharedObject) {
-        this.sharedObject = ()-> sharedObject;
-    }
-
-    @Override
-    public <R> R getShared() {
-        if(sharedObject == null){
-            throw new DecomposerException("There's no shared object defined");
-        }
-        return (R) sharedObject.get();
-    }
+public class RootContext extends ContextSupport {
 
     @Override
     public <R> R getSubTaskResult() {
@@ -40,12 +24,6 @@ public class RootContext implements DecomposedContext {
     public static RootContext create() {
         RootContext context = new RootContext();
         return context;
-    }
-
-    @Override
-    @ImplementedWithStringer
-    public String toString() {
-        return Stringer.representationOf(this);
     }
 
 }

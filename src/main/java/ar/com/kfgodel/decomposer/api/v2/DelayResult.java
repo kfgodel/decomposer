@@ -25,6 +25,12 @@ public interface DelayResult {
         return waitingFor(Arrays.asList(nextTasks));
     }
 
+    /**
+     * Creates a delayed task that will wait for the given task list resolution before
+     * being available
+     * @param subtasks The list of tasks that need to be run before accessing the result
+     * @return The delayed result
+     */
     static DelayedResult waitingFor(List<DecomposableTask> subtasks) {
         if(subtasks.isEmpty()){
             return NoPrerequisitesResult.create();

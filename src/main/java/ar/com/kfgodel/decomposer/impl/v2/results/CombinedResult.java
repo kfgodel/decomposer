@@ -4,7 +4,7 @@ import ar.com.kfgodel.decomposer.api.v2.DecomposableTask;
 import ar.com.kfgodel.decomposer.api.v2.DecomposedContext;
 import ar.com.kfgodel.decomposer.api.v2.DecomposerException;
 import ar.com.kfgodel.decomposer.api.v2.DelayedResult;
-import ar.com.kfgodel.decomposer.impl.v2.context.CombinedContext;
+import ar.com.kfgodel.decomposer.impl.v2.context.CombinatorContext;
 import ar.com.kfgodel.decomposer.impl.v2.execution.TaskExecution;
 import ar.com.kfgodel.tostring.ImplementedWithStringer;
 import ar.com.kfgodel.tostring.Stringer;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This type represents a combined result that works on previous results to produce the final one
+ * This type represents a delayed result that works on previous results to produce the final one
  * using a combinator task
  *
  * Created by kfgodel on 07/05/2015.
@@ -35,9 +35,9 @@ public class CombinedResult implements DelayedResult {
     }
 
     @Override
-    public List<TaskExecution> getPrerequisites(DecomposedContext parentContext) {
-        List<TaskExecution> combinableExecutions = prerequisite.getPrerequisites(parentContext);
-        this.combinatorExecution = TaskExecution.create(resultCombinator, CombinedContext.create(parentContext, combinableExecutions));
+    public List<TaskExecution> createPrerequisiteExecutions(DecomposedContext parentContext) {
+        List<TaskExecution> combinableExecutions = prerequisite.createPrerequisiteExecutions(parentContext);
+        this.combinatorExecution = TaskExecution.create(resultCombinator, CombinatorContext.create(parentContext, combinableExecutions));
         List<TaskExecution> combinedRequisites = new ArrayList<>(combinableExecutions);
         combinedRequisites.add(this.combinatorExecution);
         return combinedRequisites;
@@ -51,13 +51,14 @@ public class CombinedResult implements DelayedResult {
     }
 
     @Override
+    public Object get() {
+        return combinatorExecution.getEndResult();
+    }
+
+    @Override
     @ImplementedWithStringer
     public String toString() {
         return Stringer.representationOf(this);
     }
 
-    @Override
-    public Object get() {
-        return combinatorExecution.getEndResult();
-    }
 }

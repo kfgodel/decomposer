@@ -11,6 +11,8 @@ import ar.com.kfgodel.tostring.Stringer;
 import java.util.List;
 
 /**
+ * This type implements the decomposer processor for nested task resolutions
+ *
  * Created by kfgodel on 07/05/2015.
  */
 public class DecomposerProcessor implements Decomposer {
