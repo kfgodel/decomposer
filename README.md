@@ -6,36 +6,36 @@ Task processor implementation that allows decomposition of current executing tas
 ## Typical use case
 
 You want to process a task that requires certain number of steps to be done first, and maybe combine the results of them.  
-One option is to use a Java executor. However for very simple subtasks, the cost of threadh synchronization is really 
+One option is to use a Java executor. However for very simple subtasks, the cost of thread synchronization is really 
 high compared to the cost of the task itself and you also have to deal with asynchronicity.      
 
 A simpler single threaded approach is to use a decomposer processor:
 
 ```java  
- describe("a decomposer processor", () -> {
+describe("a decomposer processor", () -> {
 
-            context().decomposer(DecomposerProcessor::create);
-            
-            it("can process a task with subtasks combining their result",()->{
+  context().decomposer(DecomposerProcessor::create);
+  
+  it("can process a task with subtasks combining their result",()->{
 
-                AtomicInteger globalCounter = new AtomicInteger(0);
+    AtomicInteger globalCounter = new AtomicInteger(0);
 
-                DecomposableTask incrementalProducer = (producerTaskContex)-> String.valueOf(globalCounter.getAndIncrement());
+    DecomposableTask incrementalProducer = (producerTaskContex)-> String.valueOf(globalCounter.getAndIncrement());
 
-                DecomposableTask aTask = (taskContext)->
-                    DelayResult.waitingFor(incrementalProducer, incrementalProducer, incrementalProducer, incrementalProducer)
-                        .andFinally((CombinatorContext) -> {
-                            List<String> subTaskResults = CombinatorContext.getSubTaskResults();
-                            return subTaskResults.stream().collect(Collectors.joining(", "));
-                        });
-
-                String result = context().decomposer().process(aTask);
-
-                assertThat(result).isEqualTo("0, 1, 2, 3");
-
-            });   
-
+    DecomposableTask aTask = (taskContext)->
+      DelayResult.waitingFor(incrementalProducer, incrementalProducer, incrementalProducer, incrementalProducer)
+        .andFinally((CombinatorContext) -> {
+          List<String> subTaskResults = CombinatorContext.getSubTaskResults();
+          return subTaskResults.stream().collect(Collectors.joining(", "));
         });
+
+    String result = context().decomposer().process(aTask);
+
+    assertThat(result).isEqualTo("0, 1, 2, 3");
+
+  });   
+
+});
 ```
 
 In this example, a task that produces a list of numbers in a string, is based on several executions of a simpler task 
