@@ -45,10 +45,11 @@ that generates numbers incrementally. Since in this case we need only four numbe
 The main task waits for all the results and combines them in a single String.
  
 By using this processor the main task is executed first, the sub-tasks later, and then the combination task.  
-Any task that uses a DelayedResult as returned object indicates that needs subtasks to be processed first.
+Any task that uses a DelayedResult as returned object indicates that needs subtasks to be processed first, allowing
+you to nest any number of levels between tasks.
 
-Simplify your code by splitting complex processes into simpler tasks, without losing readability or messing with
- concurrency, threading, locks, etc, if they are not really needed.
+**Simplify your code** by splitting complex processes into simpler tasks, without losing readability or messing with
+ concurrency, threading, locks, etc, **when not really needed.**
  
-See more complex examples at [DecomposerBehaviorTest](https://github.com/kfgodel/decomposer/blob/master/src/test/java/ar/com/kfgodel/decomposer/DecomposerBehaviorTest.java)
+*See more complex examples at [DecomposerBehaviorTest](https://github.com/kfgodel/decomposer/blob/master/src/test/java/ar/com/kfgodel/decomposer/DecomposerBehaviorTest.java)*
  
