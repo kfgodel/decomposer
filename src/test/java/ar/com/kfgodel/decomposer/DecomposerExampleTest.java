@@ -31,12 +31,12 @@ public class DecomposerExampleTest extends JavaSpec<DecomposerTestContext> {
 
                 AtomicInteger globalCounter = new AtomicInteger(0);
 
-                DecomposableTask incrementalProducer = (producerTaskContex)-> String.valueOf(globalCounter.getAndIncrement());
+                DecomposableTask nextNumberProducer = (producerTaskContex)-> String.valueOf(globalCounter.getAndIncrement());
 
                 DecomposableTask aTask = (taskContext)->
-                    DelayResult.waitingFor(incrementalProducer, incrementalProducer, incrementalProducer, incrementalProducer)
-                        .andFinally((CombinatorContext) -> {
-                            List<String> subTaskResults = CombinatorContext.getSubTaskResults();
+                    DelayResult.waitingFor(nextNumberProducer, nextNumberProducer, nextNumberProducer, nextNumberProducer)
+                        .andFinally((combinatorContext) -> {
+                            List<String> subTaskResults = combinatorContext.getSubTaskResults();
                             return subTaskResults.stream().collect(Collectors.joining(", "));
                         });
 
