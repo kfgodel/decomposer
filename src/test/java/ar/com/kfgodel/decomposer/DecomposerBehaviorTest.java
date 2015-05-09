@@ -20,11 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 
 /**
- * This test verifies that the processor handles sub task branching
+ * This test verifies the expected decomposer behavior with different use cases
  * Created by kfgodel on 06/05/2015.
  */
 @RunWith(JavaSpecRunner.class)
-public class DecomposerV2Test extends JavaSpec<DecomposerTestContext> {
+public class DecomposerBehaviorTest extends JavaSpec<DecomposerTestContext> {
 
     @Override
     public void define() {
