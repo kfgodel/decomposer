@@ -1,6 +1,6 @@
 package ar.com.kfgodel.decomposer;
 
-import ar.com.dgarcia.javaspec.api.TestContext;
+import ar.com.dgarcia.javaspec.api.contexts.TestContext;
 import ar.com.kfgodel.decomposer.api.Decomposer;
 
 import java.util.function.Supplier;
