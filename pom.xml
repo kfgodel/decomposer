@@ -29,7 +29,7 @@
     <repository>
       <id>kfgodel_mosquito</id>
       <name>Repo Mosquito</name>
-      <url>http://kfgodel.info:8081/nexus/content/groups/public/</url>
+      <url>http://kfgodel.info:8081/nexus/repository/public/</url>
     </repository>
   </repositories>
 
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>ar.com.kfgodel</groupId>
       <artifactId>diamond</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+      <version>1.0.4</version>
     </dependency>
 
     <!-- Spec for testing -->
