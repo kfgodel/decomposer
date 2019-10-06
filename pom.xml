@@ -4,26 +4,30 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
+  <groupId>ar.com.kfgodel</groupId>
+  <artifactId>decomposer</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
   <parent>
     <groupId>ar.com.kfgodel</groupId>
     <artifactId>java-pom</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>ar.com.kfgodel</groupId>
-  <artifactId>decomposer</artifactId>
-  <version>1.0-SNAPSHOT</version>
-
   <name>Decomposer</name>
-  <description>Task processor implementation that allows decomposition of current executing task into subtasks
-  </description>
+  <description>Task processor implementation that allows decomposition of current executing task into subtasks</description>
+  <url>https://github.com/kfgodel/decomposer</url>
 
   <scm>
-    <connection>scm:git:ssh://github.com/kfgodel/decomposer.git</connection>
     <developerConnection>scm:git:ssh://github.com/kfgodel/decomposer.git</developerConnection>
-    <url>https://github.com/kfgodel/decomposer</url>
+    <connection>${project.scm.developerConnection}</connection>
+    <url>${project.url}</url>
   </scm>
 
+  <properties>
+    <!-- Sonar properties to prevent unintentional id changes (Reference: https://docs.sonarqube.org/latest/analysis/analysis-parameters/) -->
+    <sonar.projectKey>ar.com.kfgodel:decomposer:master</sonar.projectKey>
+  </properties>
 
   <repositories>
     <repository>
