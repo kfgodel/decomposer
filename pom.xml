@@ -26,7 +26,7 @@
 
   <properties>
     <!-- Sonar properties to prevent unintentional id changes (Reference: https://docs.sonarqube.org/latest/analysis/analysis-parameters/) -->
-    <sonar.projectKey>ar.com.kfgodel:decomposer:master</sonar.projectKey>
+    <sonar.projectKey>ar.com.kfgodel:decomposer</sonar.projectKey>
   </properties>
 
   <repositories>
