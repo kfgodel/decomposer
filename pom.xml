@@ -9,9 +9,9 @@
   <version>1.0-SNAPSHOT</version>
 
   <parent>
-    <groupId>ar.com.kfgodel</groupId>
+    <groupId>info.kfgodel</groupId>
     <artifactId>java-pom</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1.7-SNAPSHOT</version>
   </parent>
 
   <name>Decomposer</name>
@@ -50,15 +50,16 @@
 
     <!-- Reflections -->
     <dependency>
-      <groupId>ar.com.kfgodel</groupId>
+      <groupId>info.kfgodel</groupId>
       <artifactId>diamond</artifactId>
-      <version>1.0.4</version>
+      <version>1.0.5-SNAPSHOT</version>
     </dependency>
 
     <!-- Spec for testing -->
     <dependency>
-      <groupId>ar.com.dgarcia</groupId>
-      <artifactId>java-spec</artifactId>
+      <groupId>info.kfgodel</groupId>
+      <artifactId>jspek</artifactId>
+      <version>1.0.0</version>
     </dependency>
 
   </dependencies>
