@@ -15,8 +15,17 @@
   </parent>
 
   <name>Decomposer</name>
-  <description>Task processor implementation that allows decomposition of current executing task into subtasks</description>
+  <description>Task processor implementation that allows decomposition of current executing task into subtasks
+  </description>
   <url>https://github.com/kfgodel/decomposer</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <scm>
     <developerConnection>scm:git:ssh://github.com/kfgodel/decomposer.git</developerConnection>
@@ -60,5 +69,19 @@
     </dependency>
 
   </dependencies>
+
+  <developers>
+    <developer>
+      <id>dlgarcia</id>
+      <name>Dario L Garcia</name>
+      <email>dario.garcia@10pines.com</email>
+      <organization>10Pines SRL</organization>
+      <organizationUrl>https://www.10pines.com/</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
 
 </project>
