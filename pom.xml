@@ -11,7 +11,7 @@
   <parent>
     <groupId>info.kfgodel</groupId>
     <artifactId>java-pom</artifactId>
-    <version>0.1.7-SNAPSHOT</version>
+    <version>0.1.7</version>
   </parent>
 
   <name>Decomposer</name>
