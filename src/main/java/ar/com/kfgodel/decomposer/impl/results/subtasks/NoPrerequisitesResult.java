@@ -4,6 +4,7 @@ import ar.com.kfgodel.decomposer.api.DecomposerException;
 import ar.com.kfgodel.decomposer.api.context.DecomposedContext;
 import ar.com.kfgodel.decomposer.impl.execution.TaskExecution;
 import ar.com.kfgodel.decomposer.impl.results.support.DelayedResultSupport;
+import com.google.common.base.MoreObjects;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,5 +32,11 @@ public class NoPrerequisitesResult extends DelayedResultSupport {
     @Override
     public Object get() {
         throw new DecomposerException("There's no result available because it was delayed to an empty sub-task list");
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+          .toString();
     }
 }

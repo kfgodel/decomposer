@@ -5,8 +5,7 @@ import ar.com.kfgodel.decomposer.api.context.DecomposedContext;
 import ar.com.kfgodel.decomposer.api.results.DelayedResult;
 import ar.com.kfgodel.decomposer.api.results.TaskResult;
 import ar.com.kfgodel.decomposer.impl.results.DirectResult;
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
+import com.google.common.base.MoreObjects;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -69,9 +68,11 @@ public class TaskExecution {
     }
 
     @Override
-    @ImplementedWithStringer
     public String toString() {
-        return Stringer.representationOf(this);
+        return MoreObjects.toStringHelper(this)
+          .add("task", task)
+          .add("context", context)
+          .add("resultSupplier", resultSupplier)
+          .toString();
     }
-
 }

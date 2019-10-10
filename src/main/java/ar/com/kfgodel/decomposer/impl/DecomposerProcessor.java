@@ -5,8 +5,7 @@ import ar.com.kfgodel.decomposer.api.Decomposer;
 import ar.com.kfgodel.decomposer.impl.context.RootContext;
 import ar.com.kfgodel.decomposer.impl.execution.ExecutionStack;
 import ar.com.kfgodel.decomposer.impl.execution.TaskExecution;
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
+import com.google.common.base.MoreObjects;
 
 import java.util.List;
 
@@ -40,9 +39,8 @@ public class DecomposerProcessor implements Decomposer {
     }
 
     @Override
-    @ImplementedWithStringer
     public String toString() {
-        return Stringer.representationOf(this);
+        return MoreObjects.toStringHelper(this)
+          .toString();
     }
-
 }

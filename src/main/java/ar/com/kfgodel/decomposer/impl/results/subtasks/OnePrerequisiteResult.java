@@ -5,6 +5,7 @@ import ar.com.kfgodel.decomposer.api.context.DecomposedContext;
 import ar.com.kfgodel.decomposer.impl.context.ChildContext;
 import ar.com.kfgodel.decomposer.impl.execution.TaskExecution;
 import ar.com.kfgodel.decomposer.impl.results.support.DelayedResultSupport;
+import com.google.common.base.MoreObjects;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,4 +37,11 @@ public class OnePrerequisiteResult extends DelayedResultSupport {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+          .add("prerequisite", prerequisite)
+          .add("prerequisiteExecution", prerequisiteExecution)
+          .toString();
+    }
 }

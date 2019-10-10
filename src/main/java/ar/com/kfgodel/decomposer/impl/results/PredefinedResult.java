@@ -5,8 +5,7 @@ import ar.com.kfgodel.decomposer.api.DecomposerException;
 import ar.com.kfgodel.decomposer.api.context.DecomposedContext;
 import ar.com.kfgodel.decomposer.api.results.DelayedResult;
 import ar.com.kfgodel.decomposer.impl.execution.TaskExecution;
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
+import com.google.common.base.MoreObjects;
 
 import java.util.List;
 
@@ -50,9 +49,10 @@ public class PredefinedResult implements DelayedResult {
     }
 
     @Override
-    @ImplementedWithStringer
     public String toString() {
-        return Stringer.representationOf(this);
+        return MoreObjects.toStringHelper(this)
+          .add("predefinedValue", predefinedValue)
+          .add("prerequisite", prerequisite)
+          .toString();
     }
-
 }

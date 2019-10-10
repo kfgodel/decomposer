@@ -2,8 +2,7 @@ package ar.com.kfgodel.decomposer.impl.context.support;
 
 import ar.com.kfgodel.decomposer.api.DecomposerException;
 import ar.com.kfgodel.decomposer.api.context.DecomposedContext;
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
+import com.google.common.base.MoreObjects;
 
 import java.util.function.Supplier;
 
@@ -34,9 +33,9 @@ public abstract class ContextSupport implements DecomposedContext {
     }
 
     @Override
-    @ImplementedWithStringer
     public String toString() {
-        return Stringer.representationOf(this);
+        return MoreObjects.toStringHelper(this)
+          .add("ownSharedObject", ownSharedObject)
+          .toString();
     }
-
 }

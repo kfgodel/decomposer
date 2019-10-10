@@ -48,13 +48,6 @@
 
   <dependencies>
 
-    <!-- Standarized toString -->
-    <dependency>
-      <groupId>net.sf.kfgodel</groupId>
-      <artifactId>toString</artifactId>
-      <version>1.1-SNAPSHOT</version>
-    </dependency>
-
     <!-- Reflections -->
     <dependency>
       <groupId>ar.com.kfgodel</groupId>

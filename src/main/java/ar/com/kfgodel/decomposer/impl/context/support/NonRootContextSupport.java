@@ -27,4 +27,5 @@ public abstract class NonRootContextSupport extends ContextSupport {
     protected DecomposedContext getParentContext() {
         return parentContext;
     }
+
 }

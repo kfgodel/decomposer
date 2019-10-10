@@ -3,8 +3,7 @@ package ar.com.kfgodel.decomposer.impl.results;
 import ar.com.kfgodel.decomposer.api.context.DecomposedContext;
 import ar.com.kfgodel.decomposer.api.results.TaskResult;
 import ar.com.kfgodel.decomposer.impl.execution.TaskExecution;
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
+import com.google.common.base.MoreObjects;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,9 +35,9 @@ public class DirectResult implements TaskResult {
     }
 
     @Override
-    @ImplementedWithStringer
     public String toString() {
-        return Stringer.representationOf(this);
+        return MoreObjects.toStringHelper(this)
+          .add("returnedObject", returnedObject)
+          .toString();
     }
-
 }

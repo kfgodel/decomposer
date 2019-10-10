@@ -1,7 +1,6 @@
 package ar.com.kfgodel.decomposer.impl.execution;
 
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
+import com.google.common.base.MoreObjects;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -60,9 +59,9 @@ public class ExecutionStack {
     }
 
     @Override
-    @ImplementedWithStringer
     public String toString() {
-        return Stringer.representationOf(this);
+        return MoreObjects.toStringHelper(this)
+          .add("executions", executions.size())
+          .toString();
     }
-
 }

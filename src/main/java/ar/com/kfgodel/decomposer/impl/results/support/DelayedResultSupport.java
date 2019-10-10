@@ -4,8 +4,6 @@ import ar.com.kfgodel.decomposer.api.DecomposableTask;
 import ar.com.kfgodel.decomposer.api.results.DelayedResult;
 import ar.com.kfgodel.decomposer.impl.results.CombinedResult;
 import ar.com.kfgodel.decomposer.impl.results.PredefinedResult;
-import ar.com.kfgodel.tostring.ImplementedWithStringer;
-import ar.com.kfgodel.tostring.Stringer;
 
 /**
  * This type serves as a base class for implementing delayed tasks
@@ -21,12 +19,6 @@ public abstract class DelayedResultSupport implements DelayedResult {
     @Override
     public DelayedResult returning(Object returnedResult) {
         return PredefinedResult.create(this, returnedResult);
-    }
-
-    @Override
-    @ImplementedWithStringer
-    public String toString() {
-        return Stringer.representationOf(this);
     }
 
 }
