@@ -4,7 +4,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>ar.com.kfgodel</groupId>
+  <groupId>info.kfgodel</groupId>
   <artifactId>decomposer</artifactId>
   <version>1.0-SNAPSHOT</version>
 
@@ -38,14 +38,6 @@
     <sonar.projectKey>ar.com.kfgodel:decomposer</sonar.projectKey>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>kfgodel_mosquito</id>
-      <name>Repo Mosquito</name>
-      <url>http://kfgodel.info:8081/nexus/repository/public/</url>
-    </repository>
-  </repositories>
-
   <dependencies>
 
     <!-- Reflections -->
@@ -59,7 +51,6 @@
     <dependency>
       <groupId>info.kfgodel</groupId>
       <artifactId>jspek</artifactId>
-      <version>1.0.0</version>
     </dependency>
 
   </dependencies>
