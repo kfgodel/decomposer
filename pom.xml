@@ -11,7 +11,7 @@
   <parent>
     <groupId>info.kfgodel</groupId>
     <artifactId>java-pom</artifactId>
-    <version>0.1.7</version>
+    <version>0.1.8</version>
   </parent>
 
   <name>Decomposer</name>
@@ -27,34 +27,6 @@
     </license>
   </licenses>
 
-  <scm>
-    <developerConnection>scm:git:ssh://github.com/kfgodel/decomposer.git</developerConnection>
-    <connection>${project.scm.developerConnection}</connection>
-    <url>${project.url}</url>
-  </scm>
-
-  <properties>
-    <!-- Sonar properties to prevent unintentional id changes (Reference: https://docs.sonarqube.org/latest/analysis/analysis-parameters/) -->
-    <sonar.projectKey>ar.com.kfgodel:decomposer</sonar.projectKey>
-  </properties>
-
-  <dependencies>
-
-    <!-- Reflections -->
-    <dependency>
-      <groupId>info.kfgodel</groupId>
-      <artifactId>diamond</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
-    </dependency>
-
-    <!-- Spec for testing -->
-    <dependency>
-      <groupId>info.kfgodel</groupId>
-      <artifactId>jspek</artifactId>
-    </dependency>
-
-  </dependencies>
-
   <developers>
     <developer>
       <id>dlgarcia</id>
@@ -68,5 +40,35 @@
       </roles>
     </developer>
   </developers>
+
+  <scm>
+    <developerConnection>scm:git:ssh://github.com/kfgodel/decomposer.git</developerConnection>
+    <connection>${project.scm.developerConnection}</connection>
+    <url>${project.url}</url>
+  </scm>
+
+  <properties>
+    <!-- Sonar properties to prevent unintentional id changes (Reference: https://docs.sonarqube.org/latest/analysis/analysis-parameters/) -->
+    <sonar.projectKey>ar.com.kfgodel:decomposer</sonar.projectKey>
+
+    <version.diamond>1.0.5</version.diamond>
+  </properties>
+
+  <dependencies>
+
+    <!-- Reflections -->
+    <dependency>
+      <groupId>info.kfgodel</groupId>
+      <artifactId>diamond</artifactId>
+      <version>${version.diamond}</version>
+    </dependency>
+
+    <!-- Spec for testing -->
+    <dependency>
+      <groupId>info.kfgodel</groupId>
+      <artifactId>jspek</artifactId>
+    </dependency>
+
+  </dependencies>
 
 </project>
